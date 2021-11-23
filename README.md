@@ -1,3 +1,1 @@
-# django_test
-# testing
-# using model
+#Creating a skeleton website
