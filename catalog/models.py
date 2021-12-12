@@ -1,4 +1,7 @@
 from django.db import models
+
+# Create your models here.
+from django.db import models
 from django.db.models.base import Model
 from django.urls import reverse
 import uuid
@@ -10,14 +13,7 @@ class Genre(models.Model):
         return self.name
 
 class Language(models.Model):
-    lang = (
-        ('Eng' , 'English'),
-        ('Chi' , 'chinese'),
-        ('Hin' , 'Hindi'),
-        ('Spa' , 'Spanish'),      
-    )
-    name = models.CharField('Language', choices=lang,
-    max_length=3, )
+    name = models.CharField(max_length=200)
 
     def __str__(self):
         return self.name
@@ -26,15 +22,20 @@ class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey("Author", on_delete=models.SET_NULL, null=True)
     summary = models.TextField(max_length=100)
-    isbn = models.TextField('ISBN',max_length=3, unique=True)
+    isbn = models.TextField('ISBN',max_length=50, unique=True)
     genre = models.ManyToManyField(Genre,help_text='select a genre for this book')
-    language = models.ManyToManyField(Language,default='Eng',)
+    language = models.ForeignKey('Language', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse("book_detail", args=[str(self.id)])
+
+    def display_genre(self):
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+    
+    display_genre.short_description = 'Genre'
 
 class BookInstance(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
